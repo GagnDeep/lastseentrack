@@ -13,23 +13,23 @@ class LastSeen {
             this.profile = new Profile(this.page);
             this.track = new Track(this.page);
 
-            await this.login.init();
-            console.log("[login] reached web.whatsapp.com")
+            // await this.login.init();
+            // console.log("[login] reached web.whatsapp.com")
 
-            this.qr_code = await this.login.get_qr_code();
-            console.log('[login] qr code successfully generated')
+            // this.qr_code = await this.login.get_qr_code();
+            // console.log('[login] qr code successfully generated')
 
-            await this.login.wait_for_login();
-            console.log('[login] Successfully logged in')
+            // await this.login.wait_for_login();
+            // console.log('[login] Successfully logged in')
 
             // delay for dom to be rendered
-            await this.page.waitFor(2000)
+            // await this.page.waitFor(2000)
 
-            await this.profile.open(mobile)
-            console.log("[Profile] successfully opened profile: " + mobile);
+            // await this.profile.open(mobile)
+            // console.log("[Profile] successfully opened profile: " + mobile);
 
-            this.track.start();
-            console.log("[track] started tracking last seen for " + mobile)
+            // this.track.start();
+            // console.log("[track] started tracking last seen for " + mobile)
         } catch (err) {
             throw new Error(err)
         }

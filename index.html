@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Document</title>
+    <script src="/socket.io/socket.io.js"></script>
+</head>
+
+<body>
+    <img src="" alt="Scan Me !">
+</body>
+
+<script>
+    var socket = io.connect('http://localhost:8080');
+    let img = document.querySelector('img');
+
+    socket.emit('init')
+
+    socket.on('init_success', () => {
+        socket.emit('get_login_code', {})
+    })
+    socket.on('login_code', function (data) {
+        console.log(data);
+        img.setAttribute('src', data.code)
+    });
+
+    socket.on('login_success', () => {
+        img.remove()
+        socket.emit('start_tracking', {
+            mobile: '8968044978'
+        })
+    })
+
+    socket.on('person_not_found', () => {
+        console.log('person not found');
+    })
+
+    socket.on('started_tracking', () => {
+        console.log('started tracking');
+        socket.close();
+    })
+</script>
+
+</html>
