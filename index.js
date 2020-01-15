@@ -63,7 +63,7 @@ const app = express();
 //     server.listen(8080)
 
 // })()
-const port = 3000
+const port = process.env.PORT || 3000
 
 app.get('/', (req, res) => res.send('Hello World!'))
 
