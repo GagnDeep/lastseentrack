@@ -4,10 +4,16 @@
   "main": "index.js",
   "author": "gagan <dp.gagn@gmail.com>",
   "license": "MIT",
+  "scripts": {
+    "start": "node index.js"
+  },
   "dependencies": {
     "express": "^4.17.1",
     "lowdb": "^1.0.0",
     "puppeteer": "^2.0.0",
     "socket.io": "^2.3.0"
+  },
+  "engines": {
+    "node": "10.x"
   }
 }
