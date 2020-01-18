@@ -36,7 +36,8 @@ class LastSeen {
     }
 
     new_browser() {
-        return puppeteer.launch({ headless: true, args: ['--no-sandbox'] })
+        // return puppeteer.launch({ headless: true, args: ['--no-sandbox'] })
+        return puppeteer.launch({ headless: false })
     }
 
     async new_page() {

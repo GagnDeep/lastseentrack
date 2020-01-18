@@ -2,16 +2,17 @@ const LastSeen = require('./whatsapp_api');
 const express = require('express');
 const app = express();
 var server = require('http').Server(app);
-var io = require('socket.io')(server);
+var io = require('socket.io')(server, {
+    path: '/tracker_api'
+});
 
 (async function () {
+
 
     const ls = new LastSeen();
     await ls.init();
 
-    app.get('/', function (req, res) {
-        res.sendFile(__dirname + '/index.html');
-    });
+    let userIP = null;
 
     io.on('connection', function (socket) {
 
@@ -22,9 +23,38 @@ var io = require('socket.io')(server);
                 .catch(() => socket.emit('init_fail'))
         })
 
-        socket.on('start_tracking', async ({ mobile }) => {
+        socket.on('get_login_code', async function (data) {
+
+            let stopListening = null;
+
             try {
-                await ls.profile.open(mobile)
+                let code = await ls.login.get_qr_code()
+                socket.emit('login_code', { code })
+
+                stopListening = ls.login.listen_code_change((code) => socket.emit('login_code', { code }))
+
+                await ls.login.wait_for_login();
+                socket.emit('login_success')
+
+                stopListening()
+
+            } catch (err) {
+                if (stopListening) {
+                    stopListening()
+                }
+                console.log('[error] socket.on get_login_code')
+            }
+
+            socket.on('disconnect', function () {
+                console.log('disconnected');
+            })
+
+        });
+
+        socket.on('start_tracking', async ({ number }) => {
+            try {
+                console.log('to_start_track')
+                await ls.profile.open(number)
                 await ls.track.start()
                 socket.emit('started_tracking')
                 io.close(() => console.log('closed connection'))
@@ -34,33 +64,11 @@ var io = require('socket.io')(server);
         })
 
 
-        socket.on('get_login_code', async function (data) {
-
-            let code = await ls.login.get_qr_code()
-            socket.emit('login_code', { code })
-
-            let interval = setInterval(async () => {
-                let temp = await ls.login.extract_qr_code();
-                if (temp !== code) {
-                    code = temp;
-                    socket.emit('login_code', { code });
-                }
-            }, 1000)
-
-            ls.login.wait_for_login()
-                .then(() => {
-                    console.log('done login')
-                    socket.emit('login_success')
-                    clearInterval(interval)
-                })
-                .catch(err => clearInterval(interval))
-
-        });
     });
 
 
 
-    const port = process.env.PORT || 8080
+    const port = process.env.PORT || 4000;
     server.listen(port);
     console.log('server listening on port ' + port);
 
